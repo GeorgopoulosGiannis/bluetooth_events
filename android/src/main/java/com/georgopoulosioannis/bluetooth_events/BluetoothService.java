@@ -31,11 +31,6 @@ public class BluetoothService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        long callbackDispatcherHandle = intent.getLongExtra(CALLBACK_DISPATCHER_HANDLE_KEY, 0);
-
-        FlutterCallbackInformation flutterCallbackInformation =
-                FlutterCallbackInformation.lookupCallbackInformation(callbackDispatcherHandle);
-
 
 
         FlutterEngine engine = new FlutterEngine(this);
@@ -44,6 +39,10 @@ public class BluetoothService extends Service {
         }
 
         flutterLoader.ensureInitializationCompleteAsync(this,null,new Handler(Looper.getMainLooper()),()->{
+            long callbackDispatcherHandle = intent.getLongExtra(CALLBACK_DISPATCHER_HANDLE_KEY, 0);
+
+            FlutterCallbackInformation flutterCallbackInformation =
+                    FlutterCallbackInformation.lookupCallbackInformation(callbackDispatcherHandle);
             MethodChannel mBackgroundChannel = new MethodChannel(engine.getDartExecutor(), "bluetooth_events_background");
             engine.getDartExecutor().executeDartCallback(new DartExecutor.DartCallback(this.getAssets(),flutterLoader.findAppBundlePath(),flutterCallbackInformation));
             long callbackHandle = intent.getLongExtra(CALLBACK_HANDLE_KEY, 0);

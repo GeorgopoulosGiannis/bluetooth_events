@@ -3,7 +3,14 @@
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <application>
-
         <service android:name="com.georgopoulosioannis.bluetooth_events.BluetoothService" />
+        <receiver android:name=".BluetoothReceiver" android:enabled="true">
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.FOUND" />
+                <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
+                <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED" />
+                <action android:name="android.bluetooth.device.action.ACL_DISCONNECT_REQUESTED" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

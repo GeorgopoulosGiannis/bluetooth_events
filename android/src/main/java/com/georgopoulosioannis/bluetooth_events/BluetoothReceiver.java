@@ -11,11 +11,6 @@ import io.flutter.embedding.engine.loader.FlutterLoader;
 public class BluetoothReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        FlutterLoader loader = new FlutterLoader();
-        loader.startInitialization(context);
-        loader.ensureInitializationComplete(context,null);
-
-
         String action = intent.getAction();
         if(action.equals(BluetoothDevice.ACTION_FOUND)) {
             Toast.makeText(context, "BT found", Toast.LENGTH_SHORT).show();
