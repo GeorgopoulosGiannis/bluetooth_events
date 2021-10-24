@@ -5,12 +5,18 @@ import static com.georgopoulosioannis.bluetooth_events.BluetoothEventsPlugin.CAL
 import static com.georgopoulosioannis.bluetooth_events.BluetoothEventsPlugin.DEVICE_ADDRESS;
 import static com.georgopoulosioannis.bluetooth_events.BluetoothEventsPlugin.DEVICE_NAME;
 
+import android.app.Service;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.widget.Toast;
+
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
 
 import io.flutter.embedding.engine.loader.FlutterLoader;
 
@@ -19,23 +25,43 @@ public class BluetoothReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-        String deviceName =device.getName();
-        String deviceAddress =device.getAddress();
-        if(action.equals(BluetoothDevice.ACTION_FOUND)) {
+        String deviceName = device.getName();
+        String deviceAddress = device.getAddress();
+
+
+        if (action.equals(BluetoothDevice.ACTION_FOUND)) {
+
             Toast.makeText(context, "BT found", Toast.LENGTH_SHORT).show();
-        } else if(action.equals(BluetoothDevice.ACTION_ACL_CONNECTED)) {
-            Toast.makeText(context, String.format("Bluetooth connected: %s",deviceName), Toast.LENGTH_SHORT).show();
-        } else if(action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
+        } else if (action.equals(BluetoothDevice.ACTION_ACL_CONNECTED)) {
+            Toast.makeText(context, String.format("Bluetooth connected: %s", deviceName), Toast.LENGTH_SHORT).show();
+        } else if (action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
             Toast.makeText(context, "BT Disconnected", Toast.LENGTH_SHORT).show();
-        } else{
+        } else {
             Toast.makeText(context, "BT Disconnect requested", Toast.LENGTH_SHORT).show();
         }
 
+/*        Data inputData = new Data.Builder()
+                .putString("ACTION", action)
+                .putString(DEVICE_NAME, deviceName)
+                .putString(DEVICE_ADDRESS, deviceAddress)
+                .build();
+        OneTimeWorkRequest workRq = new OneTimeWorkRequest
+                .Builder(BluetoothWorker.class)
+                .setInputData(inputData)
+                .build();
 
+        WorkManager.getInstance(context).enqueue(workRq); */
 
         Intent i = new Intent(context, BluetoothService.class);
+        i.putExtra("ACTION",action);
         i.putExtra(DEVICE_NAME, deviceName);
         i.putExtra(DEVICE_ADDRESS, deviceAddress);
-        context.startService(i);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(i);
+
+        } else {
+            context.startService(i);
+        }
+
     }
 }

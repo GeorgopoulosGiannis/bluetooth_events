@@ -37,7 +37,7 @@ class _MyAppState extends State<MyApp> {
           appBar: AppBar(
             title: const Text('Flutter Example'),
           ),
-          body: Container(
+          body: Container( 
               padding: const EdgeInsets.all(20.0),
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
