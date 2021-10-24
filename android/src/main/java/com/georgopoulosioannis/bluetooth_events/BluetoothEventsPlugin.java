@@ -2,6 +2,7 @@ package com.georgopoulosioannis.bluetooth_events;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -16,8 +17,12 @@ import io.flutter.plugin.common.MethodChannel.Result;
 
 /** BluetoothEventsPlugin */
 public class BluetoothEventsPlugin implements FlutterPlugin, MethodCallHandler {
+  public static final String SHARED_PREFS_KEY="SHARED_PREFS_KEY";
   public static final String CALLBACK_HANDLE_KEY = "CALLBACK_HANDLE_KEY";
   public static final String CALLBACK_DISPATCHER_HANDLE_KEY = "CALLBACK_DISPATCH_HANDLE_KEY";
+  public static final String DEVICE_NAME="DEVICE_NAME";
+  public static final String DEVICE_ADDRESS="DEVICE_ADDRESS";
+
   private static final String TAG = "TAG";
   /// The MethodChannel that will the communication between Flutter and native Android
   ///
@@ -27,8 +32,6 @@ public class BluetoothEventsPlugin implements FlutterPlugin, MethodCallHandler {
   private MethodChannel channel;
   private Context mContext;
 
-
-  private long mCallbackDispatcherHandle;
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
@@ -40,23 +43,19 @@ public class BluetoothEventsPlugin implements FlutterPlugin, MethodCallHandler {
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
 
+    SharedPreferences prefs = mContext.getSharedPreferences(
+            SHARED_PREFS_KEY,
+            Context.MODE_PRIVATE);
     if (call.method.equals("initializeService")) {
       ArrayList args = call.arguments();
-      long callBackHandle = (long) args.get(0);
-      mCallbackDispatcherHandle = callBackHandle;
-
+      long callBackDispatcherHandle = (long) args.get(0);
+      prefs.edit().putLong(CALLBACK_DISPATCHER_HANDLE_KEY,callBackDispatcherHandle).apply();
       result.success(null);
       return;
-    } else if(call.method.equals("run")){
-
+    } else if(call.method.equals("setEventCallback")){
       ArrayList args = call.arguments();
       long callbackHandle = (long) args.get(0);
-
-      Intent i = new Intent(mContext, BluetoothService.class);
-      i.putExtra(CALLBACK_HANDLE_KEY, callbackHandle);
-      i.putExtra(CALLBACK_DISPATCHER_HANDLE_KEY, mCallbackDispatcherHandle);
-      mContext.startService(i);
-
+      prefs.edit().putLong(CALLBACK_HANDLE_KEY,callbackHandle).apply();
       result.success(null);
       return;
     }else{

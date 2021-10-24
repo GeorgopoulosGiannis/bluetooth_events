@@ -8,23 +8,29 @@ class BluetoothEvents {
   static const MethodChannel _channel = MethodChannel('bluetooth_events');
 
   static Future<void> initialize() async {
-    final callback = PluginUtilities.getCallbackHandle(callbackDispatcher);
-    var raw = callback!.toRawHandle();
+    final callbackDispatcherHandle =
+        PluginUtilities.getCallbackHandle(callbackDispatcher);
+    var rawDispatcherHandle = callbackDispatcherHandle!.toRawHandle();
+
     await _channel.invokeMethod(
       'initializeService',
-      <dynamic>[raw],
+      <dynamic>[rawDispatcherHandle],
     );
   }
 
-  static void test(void Function(String s) callback) async {
+  static Future<void> setBluetoothEventCallback(
+      void Function(Map<String,dynamic> args) callback,) async {
     try {
-      var raw = PluginUtilities.getCallbackHandle(callback)!.toRawHandle();
-      await _channel.invokeMethod('run', [raw]);
+      final callbackHandle = PluginUtilities.getCallbackHandle(callback);
+      var raw = callbackHandle!.toRawHandle();
+      await _channel.invokeMethod('setEventCallback', [raw]);
     } catch (e) {
       print(e);
     }
   }
+
 }
+ 
 
 void callbackDispatcher() {
   const MethodChannel _backgroundChannel =
@@ -36,10 +42,10 @@ void callbackDispatcher() {
     final args = call.arguments;
 
     final Function? callback = PluginUtilities.getCallbackFromHandle(
-        CallbackHandle.fromRawHandle(args[0]));
+        CallbackHandle.fromRawHandle(args['callbackHandle']));
 
     assert(callback != null);
-    String s = args[1] as String;
-    callback!(s);
+    args.remove('callbackHandle');
+    callback!(args);
   });
 }

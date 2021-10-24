@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:bluetooth_events/bluetooth_events.dart';
 
 void main() {
@@ -16,8 +15,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-
   @override
   void initState() {
     super.initState();
@@ -27,14 +24,12 @@ class _MyAppState extends State<MyApp> {
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     await BluetoothEvents.initialize();
+    await BluetoothEvents.setBluetoothEventCallback(bluetoothCallback);
   }
-
-  static void callback(String s) async {
-    print("I am from main.dart");
-    print(s);
-
+  static void bluetoothCallback(dynamic args){
+    print(args);
   }
-
+ 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -50,15 +45,10 @@ class _MyAppState extends State<MyApp> {
                     Center(
                       child: RaisedButton(
                         child: const Text('Run'),
-                        onPressed: () {
-                          BluetoothEvents.test(callback);
-                        },
+                        onPressed: () {},
                       ),
                     ),
-                  ]
-              )
-          )
-      ),
+                  ]))),
     );
   }
 }
