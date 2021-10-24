@@ -54,18 +54,11 @@ public class BluetoothService extends Service {
             FlutterCallbackInformation flutterCallbackInformation =
                     FlutterCallbackInformation.lookupCallbackInformation(callbackDispatcherHandle);
             MethodChannel mBackgroundChannel = new MethodChannel(engine.getDartExecutor(), "bluetooth_events_background");
-
             engine.getDartExecutor().executeDartCallback(new DartExecutor.DartCallback(this.getAssets(),flutterLoader.findAppBundlePath(),flutterCallbackInformation));
-
             final Map<String,Object> m = new HashMap<String,Object>();
             m.put("callbackHandle",callbackHandle);
             m.put(DEVICE_NAME,intent.getStringExtra(DEVICE_NAME));
             m.put(DEVICE_ADDRESS,intent.getStringExtra(DEVICE_ADDRESS));
-           /* final ArrayList<Object> l = new ArrayList<Object>();
-
-            l.add(callbackHandle);
-            l.add(intent.getStringExtra(DEVICE_NAME));
-            l.add(intent.getStringExtra(DEVICE_ADDRESS));*/
             mBackgroundChannel.invokeMethod("",m);
         });
 
