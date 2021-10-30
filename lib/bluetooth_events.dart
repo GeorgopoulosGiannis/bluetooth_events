@@ -19,7 +19,8 @@ class BluetoothEvents {
   }
 
   static Future<void> setBluetoothEventCallback(
-      void Function(Map<String,dynamic> args) callback,) async {
+    void Function(Map<String, dynamic> args) callback,
+  ) async {
     try {
       final callbackHandle = PluginUtilities.getCallbackHandle(callback);
       var raw = callbackHandle!.toRawHandle();
@@ -28,9 +29,7 @@ class BluetoothEvents {
       print(e);
     }
   }
-
 }
- 
 
 void callbackDispatcher() {
   const MethodChannel _backgroundChannel =
@@ -46,7 +45,9 @@ void callbackDispatcher() {
 
     assert(callback != null);
     args.remove('callbackHandle');
+
     callback!(args);
+    return 'success';
   });
   _backgroundChannel.invokeMethod<void>('BluetoothService.initialized');
 }

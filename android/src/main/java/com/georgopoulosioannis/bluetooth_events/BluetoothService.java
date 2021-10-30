@@ -1,23 +1,30 @@
 package com.georgopoulosioannis.bluetooth_events;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.JobIntentService;
 
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+public class BluetoothService extends Service {
+    private static String CHANNEL_ID = "channel_id";
+    private static String CHANNEL_NAME = "CHANNEL_NAME";
 
 
-public class BluetoothService extends JobIntentService {
     private static final String TAG = "AlarmService";
     private static final int JOB_ID = 1984; // Random job ID.
 
@@ -26,10 +33,67 @@ public class BluetoothService extends JobIntentService {
     /** Background Dart execution context. */
     private static FlutterBackgroundExecutor flutterBackgroundExecutor;
 
-    /** Schedule the bluetooth to be handled by the {@link BluetoothService}. */
-    public static void enqueueBluetoothProcessing(Context context, Intent bluetoothContext) {
-        enqueueWork(context, BluetoothService.class, JOB_ID, bluetoothContext);
+
+    @Override
+    public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setDescription("Test descritpion");
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+
+            Intent notificationIntent = new Intent(this, BluetoothService.class);
+            PendingIntent pendingIntent =
+                    PendingIntent.getActivity(this, 0, notificationIntent, 0);
+        Notification notification = new Notification.Builder(this,CHANNEL_ID )
+                    .setContentTitle("titltitle")
+                    .setContentText("content text content text")
+                    .setContentIntent(pendingIntent)
+                    .setTicker("ticker ticker ticker")
+                    .build();
+            startForeground(1,notification);
+
+        }
+        doWork(intent);
+        return super.onStartCommand(intent, flags, startId);
     }
+    private void doWork( Intent intent){
+        // If we're in the middle of processing queued alarms, add the incoming
+        // intent to the queue and return.
+        synchronized (bluetoothQueue) {
+            if (!flutterBackgroundExecutor.isRunning()) {
+                Log.i(TAG, "BluetoothService has not yet started.");
+                bluetoothQueue.add(intent);
+                return;
+            }
+        }
+
+        // There were no pre-existing callback requests. Execute the callback
+        // specified by the incoming intent.
+        final CountDownLatch latch = new CountDownLatch(1);
+        /*new Handler(getMainLooper())
+                .post(
+                        () -> flutterBackgroundExecutor.executeDartCallbackInBackgroundIsolate(intent, latch)); */
+        flutterBackgroundExecutor.executeDartCallbackInBackgroundIsolate(intent, latch);
+        try {
+            stopSelf();
+            latch.await();
+
+        } catch (InterruptedException ex) {
+            Log.i(TAG, "Exception waiting to execute Dart callback", ex);
+        }
+
+
+    }
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+
+
     /**
      * Starts the background isolate for the {@link BluetoothService}.
      *
@@ -87,45 +151,6 @@ public class BluetoothService extends JobIntentService {
         }
         Context context = getApplicationContext();
         flutterBackgroundExecutor.startBackgroundIsolate(context);
-    }
-
-    /**
-     * Executes a Dart callback, as specified within the incoming {@code intent}.
-     *
-     * <p>Invoked by our {@link JobIntentService} superclass after a call to {@link
-     * JobIntentService#enqueueWork(Context, Class, int, Intent);}.
-     *
-     * <p>If there are no pre-existing callback execution requests, other than the incoming {@code
-     * intent}, then the desired Dart callback is invoked immediately.
-     *
-     * <p>If there are any pre-existing callback requests that have yet to be executed, the incoming
-     * {@code intent} is added to the {@link #bluetoothQueue} to invoked later, after all pre-existing
-     * callbacks have been executed.
-     */
-    @Override
-    protected void onHandleWork(@NonNull final Intent intent) {
-        // If we're in the middle of processing queued alarms, add the incoming
-        // intent to the queue and return.
-        synchronized (bluetoothQueue) {
-            if (!flutterBackgroundExecutor.isRunning()) {
-                Log.i(TAG, "BluetoothService has not yet started.");
-                bluetoothQueue.add(intent);
-                return;
-            }
-        }
-
-        // There were no pre-existing callback requests. Execute the callback
-        // specified by the incoming intent.
-        final CountDownLatch latch = new CountDownLatch(1);
-        new Handler(getMainLooper())
-                .post(
-                        () -> flutterBackgroundExecutor.executeDartCallbackInBackgroundIsolate(intent, latch));
-
-        try {
-            latch.await();
-        } catch (InterruptedException ex) {
-            Log.i(TAG, "Exception waiting to execute Dart callback", ex);
-        }
     }
 
 }

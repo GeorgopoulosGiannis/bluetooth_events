@@ -76,7 +76,9 @@ public class FlutterBackgroundExecutor implements MethodCallHandler {
                 // the Dart methods corresponding to those callback handles.
                 onInitialized();
                 result.success(true);
-            } else {
+            } else if(method.equals("BluetoothService.done")){
+
+            }else {
                 result.notImplemented();
             }
         } catch (Exception e ) {
@@ -200,7 +202,8 @@ public class FlutterBackgroundExecutor implements MethodCallHandler {
         m.put("callbackHandle",callbackHandle);
         m.put(DEVICE_NAME,intent.getStringExtra(DEVICE_NAME));
         m.put(DEVICE_ADDRESS,intent.getStringExtra(DEVICE_ADDRESS));
-        backgroundChannel.invokeMethod("",m);
+        backgroundChannel.invokeMethod("",m,result);
+        latch.countDown();
 
     }
 

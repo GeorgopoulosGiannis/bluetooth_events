@@ -31,7 +31,7 @@ class LocalNotificationSrv {
       android: androidPlatformChannelSpecifics,
     );
     await flutterLocalNotificationsPlugin.show(
-      0,
+      123,
       'plain title',
       'plain body',
       platformChannelSpecifics,

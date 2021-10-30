@@ -54,7 +54,7 @@ public class BluetoothReceiver extends BroadcastReceiver {
             context.startService(i);
         } */
 
-        Intent i = new Intent(context, BluetoothForegroundService.class);
+        Intent i = new Intent(context, BluetoothService.class);
         i.putExtra("ACTION",action);
         i.putExtra(DEVICE_NAME, deviceName);
         i.putExtra(DEVICE_ADDRESS, deviceAddress);
