@@ -13,7 +13,7 @@ class BluetoothEvents {
     var rawDispatcherHandle = callbackDispatcherHandle!.toRawHandle();
 
     await _channel.invokeMethod(
-      'initializeService',
+      'BluetoothEvents.initializeService',
       <dynamic>[rawDispatcherHandle],
     );
   }
@@ -48,4 +48,5 @@ void callbackDispatcher() {
     args.remove('callbackHandle');
     callback!(args);
   });
+  _backgroundChannel.invokeMethod<void>('BluetoothService.initialized');
 }

@@ -1,9 +1,7 @@
 package com.georgopoulosioannis.bluetooth_events;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -46,10 +44,11 @@ public class BluetoothEventsPlugin implements FlutterPlugin, MethodCallHandler {
     SharedPreferences prefs = mContext.getSharedPreferences(
             SHARED_PREFS_KEY,
             Context.MODE_PRIVATE);
-    if (call.method.equals("initializeService")) {
+    if (call.method.equals("BluetoothEvents.initializeService")) {
       ArrayList args = call.arguments();
       long callBackDispatcherHandle = (long) args.get(0);
-      prefs.edit().putLong(CALLBACK_DISPATCHER_HANDLE_KEY,callBackDispatcherHandle).apply();
+      BluetoothService.setCallbackDispatcher(mContext, callBackDispatcherHandle);
+      BluetoothService.startBackgroundIsolate(mContext, callBackDispatcherHandle);
       result.success(null);
       return;
     } else if(call.method.equals("setEventCallback")){

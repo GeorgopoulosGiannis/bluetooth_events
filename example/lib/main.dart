@@ -28,6 +28,7 @@ class _MyAppState extends State<MyApp> {
   }
   static void bluetoothCallback(dynamic args){
     print(args);
+    
   }
  
   @override
