@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.widget.Toast;
 
 public class BluetoothReceiver extends BroadcastReceiver {
@@ -53,12 +54,18 @@ public class BluetoothReceiver extends BroadcastReceiver {
             context.startService(i);
         } */
 
-        Intent i = new Intent(context, BluetoothService.class);
+        Intent i = new Intent(context, BluetoothForegroundService.class);
         i.putExtra("ACTION",action);
         i.putExtra(DEVICE_NAME, deviceName);
         i.putExtra(DEVICE_ADDRESS, deviceAddress);
         i.putExtra("callbackHandle",context.getSharedPreferences(SHARED_PREFS_KEY, 0).getLong(BluetoothEventsPlugin.CALLBACK_HANDLE_KEY, 0));
-        BluetoothService.enqueueBluetoothProcessing(context,i);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(i);
+        }else{
+            context.startService(i);
+        }
+        /**BluetoothService.enqueueBluetoothProcessing(context,i);*/
 
 
     }

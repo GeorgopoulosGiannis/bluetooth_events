@@ -1,5 +1,8 @@
 package com.georgopoulosioannis.bluetooth_events;
 
+import android.app.IntentService;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -9,15 +12,36 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.JobIntentService;
 
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+public class BluetoothForegroundService extends JobIntentService {
+
+    @Override
+    public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            Intent notificationIntent = new Intent(this, BluetoothForegroundService.class);
+            PendingIntent pendingIntent =
+                    PendingIntent.getActivity(this, 0, notificationIntent, 0);
+            Notification notification =
+                    null;
+            notification = new Notification.Builder(this, "1")
+                    .setContentTitle("titltitle")
+                    .setContentText("content text content text")
+                    .setContentIntent(pendingIntent)
+                    .setTicker("ticker ticker ticker")
+                    .build();
+            startForeground(startId,notification);
+        }
+
+        return super.onStartCommand(intent, flags, startId);
+    }
 
 
-public class BluetoothService extends JobIntentService {
+
     private static final String TAG = "AlarmService";
     private static final int JOB_ID = 1984; // Random job ID.
 
@@ -127,5 +151,4 @@ public class BluetoothService extends JobIntentService {
             Log.i(TAG, "Exception waiting to execute Dart callback", ex);
         }
     }
-
 }

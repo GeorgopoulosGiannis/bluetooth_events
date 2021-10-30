@@ -1,9 +1,14 @@
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:bluetooth_events/bluetooth_events.dart';
 
-void main() {
+import 'local_notification_srv.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
   runApp(const MyApp());
 }
 
@@ -23,14 +28,15 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
+    await LocalNotificationSrv.initialize();
     await BluetoothEvents.initialize();
     await BluetoothEvents.setBluetoothEventCallback(bluetoothCallback);
   }
-  static void bluetoothCallback(dynamic args){
-    print(args);
-    
+
+  static void bluetoothCallback(dynamic args) {
+    LocalNotificationSrv.showNotification();
   }
- 
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -38,7 +44,7 @@ class _MyAppState extends State<MyApp> {
           appBar: AppBar(
             title: const Text('Flutter Example'),
           ),
-          body: Container( 
+          body: Container(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -46,7 +52,9 @@ class _MyAppState extends State<MyApp> {
                     Center(
                       child: RaisedButton(
                         child: const Text('Run'),
-                        onPressed: () {},
+                        onPressed: () {
+                          LocalNotificationSrv.showNotification();
+                        },
                       ),
                     ),
                   ]))),
