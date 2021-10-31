@@ -77,9 +77,8 @@ public class BluetoothService extends Service {
                         () -> flutterBackgroundExecutor.executeDartCallbackInBackgroundIsolate(intent, latch)); */
         flutterBackgroundExecutor.executeDartCallbackInBackgroundIsolate(intent, latch);
         try {
-            stopSelf();
             latch.await();
-
+            stopSelf();
         } catch (InterruptedException ex) {
             Log.i(TAG, "Exception waiting to execute Dart callback", ex);
         }
