@@ -1,15 +1,12 @@
 # bluetooth_events
 
-A new flutter plugin project.
+A Flutter plugin that allows you to execute dart callbacks even when your app is not running, when a bluetooth event is received (e.g BluetoothDevice.ACTION_ACL_CONNECTED, BluetoothDevice.ACTION_ACL_DISCONNECTED)
 
 ## Getting Started
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
+Include package in pubspec.yaml and then call : 
+```dart
+    await BluetoothEvents.initialize();
+    await BluetoothEvents.setBluetoothEventCallback(bluetoothCallback);
+``` 
+where bluetoothCallback is the callback which will be invoked whenever a bluetooth event is received.
