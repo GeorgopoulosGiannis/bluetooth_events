@@ -1,5 +1,6 @@
 package com.georgopoulosioannis.bluetooth_events;
 
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -30,7 +31,9 @@ public class BluetoothService extends Service {
 
     private static final List<Intent> bluetoothQueue = Collections.synchronizedList(new LinkedList<>());
 
-    /** Background Dart execution context. */
+    /**
+     * Background Dart execution context.
+     */
     private static FlutterBackgroundExecutor flutterBackgroundExecutor;
 
 
@@ -46,19 +49,21 @@ public class BluetoothService extends Service {
             Intent notificationIntent = new Intent(this, BluetoothService.class);
             PendingIntent pendingIntent =
                     PendingIntent.getActivity(this, 0, notificationIntent, 0);
-        Notification notification = new Notification.Builder(this,CHANNEL_ID )
+            Notification notification = new Notification.Builder(this, CHANNEL_ID)
                     .setContentTitle("titltitle")
                     .setContentText("content text content text")
                     .setContentIntent(pendingIntent)
                     .setTicker("ticker ticker ticker")
                     .build();
-            startForeground(1,notification);
+            startForeground(1, notification);
 
         }
+
         doWork(intent);
         return super.onStartCommand(intent, flags, startId);
     }
-    private void doWork( Intent intent){
+
+    private void doWork(Intent intent) {
         // If we're in the middle of processing queued alarms, add the incoming
         // intent to the queue and return.
         synchronized (bluetoothQueue) {
@@ -72,25 +77,27 @@ public class BluetoothService extends Service {
         // There were no pre-existing callback requests. Execute the callback
         // specified by the incoming intent.
         final CountDownLatch latch = new CountDownLatch(1);
-        /*new Handler(getMainLooper())
+        new Handler(getMainLooper())
                 .post(
-                        () -> flutterBackgroundExecutor.executeDartCallbackInBackgroundIsolate(intent, latch)); */
-        flutterBackgroundExecutor.executeDartCallbackInBackgroundIsolate(intent, latch);
-        try {
-            latch.await();
-            stopSelf();
-        } catch (InterruptedException ex) {
-            Log.i(TAG, "Exception waiting to execute Dart callback", ex);
-        }
-
-
+                        () -> flutterBackgroundExecutor.executeDartCallbackInBackgroundIsolate(intent, latch));
+        final Thread t = new Thread() {
+            public void run() {
+                    try {
+                    latch.await();
+                    stopSelf();
+                } catch (InterruptedException ex) {
+                    Log.i(TAG, "Exception waiting to execute Dart callback", ex);
+                }
+            }
+        };
+        t.start();
     }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
-
 
 
     /**
@@ -119,7 +126,8 @@ public class BluetoothService extends Service {
      * BluetoothEvents.startInitialize} message. Processes all alarm events that came in while the isolate
      * was starting.
      */
-    /* package */ static void onInitialized() {
+    /* package */
+    static void onInitialized() {
         Log.i(TAG, "BluetoothService started!");
         synchronized (bluetoothQueue) {
             // Handle all the alarm events received before the Dart isolate was
@@ -138,8 +146,6 @@ public class BluetoothService extends Service {
     public static void setCallbackDispatcher(Context context, long callbackHandle) {
         FlutterBackgroundExecutor.setCallbackDispatcher(context, callbackHandle);
     }
-
-
 
 
     @Override

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -8,7 +7,7 @@ import 'local_notification_srv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   runApp(const MyApp());
 }
 
@@ -34,8 +33,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   static void bluetoothCallback(dynamic args) {
-    print(args);
-    LocalNotificationSrv.showNotification();
+    Future.delayed(Duration(seconds: 2)).then(
+      (value) => LocalNotificationSrv.showNotification(),
+    );
   }
 
   @override

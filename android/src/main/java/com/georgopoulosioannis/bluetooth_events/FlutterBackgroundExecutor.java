@@ -177,7 +177,8 @@ public class FlutterBackgroundExecutor implements MethodCallHandler {
 
         // If another thread is waiting, then wake that thread when the callback returns a result.
         MethodChannel.Result result = null;
-    /*    if (latch != null) {
+
+       if (latch != null) {
             result =
                     new MethodChannel.Result() {
                         @Override
@@ -195,16 +196,14 @@ public class FlutterBackgroundExecutor implements MethodCallHandler {
                             latch.countDown();
                         }
                     };
-        } */
+        }
 
 
         final Map<String,Object> m = new HashMap<String,Object>();
         m.put("callbackHandle",callbackHandle);
         m.put(DEVICE_NAME,intent.getStringExtra(DEVICE_NAME));
         m.put(DEVICE_ADDRESS,intent.getStringExtra(DEVICE_ADDRESS));
-        backgroundChannel.invokeMethod("",m);
-        latch.countDown();
-
+        backgroundChannel.invokeMethod("",m,result);
     }
 
     private void initializeMethodChannel(BinaryMessenger isolate) {
