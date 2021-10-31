@@ -19,3 +19,7 @@ TO retrieve all bonded devices :
 ```dart
     await BluetoothEvents.getBondedDevices();
 ```
+
+
+### Example
+The example provided in example/ folder uses LocalNotification package to trigger a notification when a device gets connected or disconnected via bluetooth.
