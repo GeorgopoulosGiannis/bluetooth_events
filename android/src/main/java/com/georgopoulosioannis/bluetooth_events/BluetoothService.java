@@ -22,11 +22,11 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class BluetoothService extends Service {
-    private static String CHANNEL_ID = "channel_id";
-    private static String CHANNEL_NAME = "CHANNEL_NAME";
+    private static String CHANNEL_ID = "BLUETOOTH_SERVICE_CHANNEL_ID";
+    private static String CHANNEL_NAME = "BLUETOOTH_SERVICE_CHANNEL_NAME";
 
 
-    private static final String TAG = "AlarmService";
+    private static final String TAG = "BluetoothService";
     private static final int JOB_ID = 1984; // Random job ID.
 
     private static final List<Intent> bluetoothQueue = Collections.synchronizedList(new LinkedList<>());
@@ -42,7 +42,7 @@ public class BluetoothService extends Service {
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
-            channel.setDescription("Test descritpion");
+            channel.setDescription("Test description");
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
 
@@ -50,13 +50,9 @@ public class BluetoothService extends Service {
             PendingIntent pendingIntent =
                     PendingIntent.getActivity(this, 0, notificationIntent, 0);
             Notification notification = new Notification.Builder(this, CHANNEL_ID)
-                    .setContentTitle("titltitle")
-                    .setContentText("content text content text")
                     .setContentIntent(pendingIntent)
-                    .setTicker("ticker ticker ticker")
                     .build();
             startForeground(1, notification);
-
         }
 
         doWork(intent);
@@ -64,7 +60,7 @@ public class BluetoothService extends Service {
     }
 
     private void doWork(Intent intent) {
-        // If we're in the middle of processing queued alarms, add the incoming
+        // If we're in the middle of processing queued events, add the incoming
         // intent to the queue and return.
         synchronized (bluetoothQueue) {
             if (!flutterBackgroundExecutor.isRunning()) {
@@ -123,14 +119,14 @@ public class BluetoothService extends Service {
      * Called once the Dart isolate ({@code flutterBackgroundExecutor}) has finished initializing.
      *
      * <p>Invoked by {@link BluetoothEventsPlugin} when it receives the {@code
-     * BluetoothEvents.startInitialize} message. Processes all alarm events that came in while the isolate
+     * BluetoothEvents.startInitialize} message. Processes all bluetooth events that came in while the isolate
      * was starting.
      */
     /* package */
     static void onInitialized() {
         Log.i(TAG, "BluetoothService started!");
         synchronized (bluetoothQueue) {
-            // Handle all the alarm events received before the Dart isolate was
+            // Handle all the bluetooth events received before the Dart isolate was
             // initialized, then clear the queue.
             for (Intent intent : bluetoothQueue) {
                 flutterBackgroundExecutor.executeDartCallbackInBackgroundIsolate(intent, null);

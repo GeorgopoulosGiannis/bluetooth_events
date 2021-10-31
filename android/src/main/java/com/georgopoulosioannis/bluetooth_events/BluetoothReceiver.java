@@ -19,41 +19,6 @@ public class BluetoothReceiver extends BroadcastReceiver {
         String deviceName = device.getName();
         String deviceAddress = device.getAddress();
 
-
-        if (action.equals(BluetoothDevice.ACTION_FOUND)) {
-
-            Toast.makeText(context, "BT found", Toast.LENGTH_SHORT).show();
-        } else if (action.equals(BluetoothDevice.ACTION_ACL_CONNECTED)) {
-            Toast.makeText(context, String.format("Bluetooth connected: %s", deviceName), Toast.LENGTH_SHORT).show();
-        } else if (action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
-            Toast.makeText(context, "BT Disconnected", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(context, "BT Disconnect requested", Toast.LENGTH_SHORT).show();
-        }
-
-  /*      Data inputData = new Data.Builder()
-                .putString("ACTION", action)
-                .putString(DEVICE_NAME, deviceName)
-                .putString(DEVICE_ADDRESS, deviceAddress)
-                .build();
-        OneTimeWorkRequest workRq = new OneTimeWorkRequest
-                .Builder(BluetoothWorker.class)
-                .setInputData(inputData)
-                .build();
-
-        WorkManager.getInstance(context).enqueue(workRq); */
-
-    /*    Intent i = new Intent(context, BluetoothService.class);
-        i.putExtra("ACTION",action);
-        i.putExtra(DEVICE_NAME, deviceName);
-        i.putExtra(DEVICE_ADDRESS, deviceAddress);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(i);
-
-        } else {
-            context.startService(i);
-        } */
-
         Intent i = new Intent(context, BluetoothService.class);
         i.putExtra("ACTION",action);
         i.putExtra(DEVICE_NAME, deviceName);
@@ -65,8 +30,6 @@ public class BluetoothReceiver extends BroadcastReceiver {
         }else{
             context.startService(i);
         }
-        /**BluetoothService.enqueueBluetoothProcessing(context,i);*/
-
 
     }
 }

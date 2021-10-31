@@ -54,7 +54,7 @@ public class FlutterBackgroundExecutor implements MethodCallHandler {
         prefs.edit().putLong(BluetoothEventsPlugin.CALLBACK_DISPATCHER_HANDLE_KEY, callbackDispatcherHandle).apply();
     }
 
-    /** Returns true when the background isolate has started and is ready to handle alarms. */
+    /** Returns true when the background isolate has started and is ready to handle bluetooth events. */
     public boolean isRunning() {
         return isCallbackDispatcherReady.get();
     }
@@ -82,7 +82,7 @@ public class FlutterBackgroundExecutor implements MethodCallHandler {
                 result.notImplemented();
             }
         } catch (Exception e ) {
-            result.error("error", "AlarmManager error: " + e.getMessage(), null);
+            result.error("error", "BluetoothEvents error: " + e.getMessage(), null);
         }
     }
 
@@ -209,7 +209,7 @@ public class FlutterBackgroundExecutor implements MethodCallHandler {
     private void initializeMethodChannel(BinaryMessenger isolate) {
         // backgroundChannel is the channel responsible for receiving the following messages from
         // the background isolate that was setup by this plugin:
-        // - "AlarmService.initialized"
+        // - "BluetoothService.initialized"
         //
         // This channel is also responsible for sending requests from Android to Dart to execute Dart
         // callbacks in the background isolate.
