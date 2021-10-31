@@ -19,6 +19,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  Map<String, dynamic> bondedDevices = {};
+  Map<String, dynamic> connectedDevices = {};
   @override
   void initState() {
     super.initState();
@@ -42,23 +44,71 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-          appBar: AppBar(
-            title: const Text('Flutter Example'),
+        appBar: AppBar(
+          title: const Text('Flutter Example'),
+        ),
+        body: Container(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: <Widget>[
+              RaisedButton(
+                child: const Text('bonded devices'),
+                onPressed: () async {
+                  try {
+                    bondedDevices = await BluetoothEvents.getBondedDevices();
+                    setState(() {});
+                  } catch (e) {}
+
+                  print(bondedDevices);
+                },
+              ),
+              Flexible(
+                child: ListView.builder(
+                  itemCount: bondedDevices.length,
+                  itemBuilder: (context, index) {
+                    final curDev = Map<String, dynamic>.from(
+                        bondedDevices.values.elementAt(index));
+                    final sub = curDev.entries.fold(
+                        ' address : ${bondedDevices.keys.elementAt(index)}',
+                        (previousValue, element) =>
+                            '$previousValue \n ${element.key} : ${element.value}');
+                    return ListTile(
+                      title: Text(curDev['name']),
+                      subtitle: Text(sub),
+                    );
+                  },
+                ),
+              ),
+              RaisedButton(
+                child: const Text('connected devices'),
+                onPressed: () async {
+                  connectedDevices =
+                      await BluetoothEvents.getConnectedDevices();
+                  print(connectedDevices);
+                },
+              ),
+              if (connectedDevices.isNotEmpty)
+                Flexible(
+                  child: ListView.builder(
+                    itemCount: connectedDevices.length,
+                    itemBuilder: (context, index) {
+                      final curDev = Map<String, dynamic>.from(
+                          connectedDevices.values.elementAt(index));
+                      final sub = curDev.entries.fold(
+                          ' address : ${connectedDevices.keys.elementAt(index)}',
+                          (previousValue, element) =>
+                              '$previousValue \n ${element.key} : ${element.value}');
+                      return ListTile(
+                        title: Text(curDev['name']),
+                        subtitle: Text(sub),
+                      );
+                    },
+                  ),
+                ),
+            ],
           ),
-          body: Container(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Center(
-                      child: RaisedButton(
-                        child: const Text('Run'),
-                        onPressed: () {
-                          LocalNotificationSrv.showNotification();
-                        },
-                      ),
-                    ),
-                  ]))),
+        ),
+      ),
     );
   }
 }

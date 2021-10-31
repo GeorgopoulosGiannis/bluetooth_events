@@ -21,6 +21,8 @@ public class BluetoothEventsPlugin implements FlutterPlugin, MethodCallHandler {
   public static final String DEVICE_NAME="DEVICE_NAME";
   public static final String DEVICE_ADDRESS="DEVICE_ADDRESS";
 
+  private static BluetoothManagerWrapper managerWrapper;
+
   private static final String TAG = "TAG";
   /// The MethodChannel that will the communication between Flutter and native Android
   ///
@@ -36,6 +38,7 @@ public class BluetoothEventsPlugin implements FlutterPlugin, MethodCallHandler {
     mContext = flutterPluginBinding.getApplicationContext();
     channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "bluetooth_events");
     channel.setMethodCallHandler(this);
+    managerWrapper = new BluetoothManagerWrapper(mContext);
   }
 
   @Override
@@ -57,7 +60,11 @@ public class BluetoothEventsPlugin implements FlutterPlugin, MethodCallHandler {
       prefs.edit().putLong(CALLBACK_HANDLE_KEY,callbackHandle).apply();
       result.success(null);
       return;
-    }else{
+    } else if (call.method.equals("getPairedDevices")){
+      result.success(managerWrapper.getPairedDevices());
+    } else if(call.method.equals("getConnectedDevices")){
+      result.success(managerWrapper.getConnectedDevices());
+    } else{
       result.notImplemented();
     }
   }
@@ -67,4 +74,5 @@ public class BluetoothEventsPlugin implements FlutterPlugin, MethodCallHandler {
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     channel.setMethodCallHandler(null);
   }
+
 }
