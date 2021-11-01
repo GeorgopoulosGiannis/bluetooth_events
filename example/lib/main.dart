@@ -63,7 +63,8 @@ class _MyAppState extends State<MyApp> {
                 },
               ),
               Flexible(
-                child: ListView.builder(
+                child: ListView.separated(
+                  separatorBuilder: (ctx, index) => const Divider(),
                   itemCount: bondedDevices.length,
                   itemBuilder: (context, index) {
                     final curDev = Map<String, dynamic>.from(
@@ -89,7 +90,8 @@ class _MyAppState extends State<MyApp> {
               ),
               if (connectedDevices.isNotEmpty)
                 Flexible(
-                  child: ListView.builder(
+                  child: ListView.separated(
+                    separatorBuilder: (ctx, index) => const Divider(),
                     itemCount: connectedDevices.length,
                     itemBuilder: (context, index) {
                       final curDev = Map<String, dynamic>.from(

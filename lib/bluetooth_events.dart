@@ -32,15 +32,12 @@ class BluetoothEvents {
 
   static Future<Map<String, dynamic>> getBondedDevices() async {
     final devices = await _channel.invokeMethod<Map>('getPairedDevices');
-    final result = devices?.cast<String, dynamic>();
-
-    return result!;
+    return devices?.cast<String, dynamic>() ?? {};
   }
 
   static Future<Map<String, dynamic>> getConnectedDevices() async {
-    final devices = await _channel.invokeMethod('getConnectedDevices');
-    
-    return devices?.cast<String, dynamic>();
+    final devices = await _channel.invokeMethod<Map>('getConnectedDevices');
+    return devices?.cast<String, dynamic>() ?? {};
   }
 }
 
@@ -59,7 +56,7 @@ void callbackDispatcher() {
     assert(callback != null);
     args.remove('callbackHandle');
 
-    callback!(args);
+    callback!(args.cast<String, dynamic>());
     return 'success';
   });
   _backgroundChannel.invokeMethod<void>('BluetoothService.initialized');
