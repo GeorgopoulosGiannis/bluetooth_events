@@ -203,6 +203,7 @@ public class FlutterBackgroundExecutor implements MethodCallHandler {
         m.put("callbackHandle",callbackHandle);
         m.put(DEVICE_NAME,intent.getStringExtra(DEVICE_NAME));
         m.put(DEVICE_ADDRESS,intent.getStringExtra(DEVICE_ADDRESS));
+        m.put("ACTION",intent.getStringExtra("ACTION"));
         backgroundChannel.invokeMethod("",m,result);
     }
 

@@ -21,13 +21,11 @@ class BluetoothEvents {
   static Future<void> setBluetoothEventCallback(
     void Function(Map<String, dynamic> args) callback,
   ) async {
-    try {
+    
       final callbackHandle = PluginUtilities.getCallbackHandle(callback);
       var raw = callbackHandle!.toRawHandle();
       await _channel.invokeMethod('setEventCallback', [raw]);
-    } catch (e) {
-      print(e);
-    }
+    
   }
 
   static Future<Map<String, dynamic>> getBondedDevices() async {
